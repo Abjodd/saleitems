@@ -10,11 +10,11 @@ const CLARITY: ClarityGrade[] = ["FL","IF","VVS1","VVS2","VS1","VS2","SI1","SI2"
 const GRADES: CutGrade[] = ["Excellent","Very Good","Good","Fair","Poor","N/A"];
 
 const STATUS_PILL: Record<SubmissionStatus, { bg: string; text: string; dot: string }> = {
-  "Pending":     { bg: "#2a1f00", text: "#f59e0b", dot: "#f59e0b" },
-  "In Progress": { bg: "#001a2e", text: "#38bdf8", dot: "#38bdf8" },
-  "Completed":   { bg: "#002a1a", text: "#34d399", dot: "#34d399" },
-  "On Hold":     { bg: "#2a0a0a", text: "#f87171", dot: "#f87171" },
-  "Dispatched":  { bg: "#1a0a2e", text: "#a78bfa", dot: "#a78bfa" },
+  "Pending":     { bg: "#fef9ec", text: "#b45309", dot: "#f59e0b" },
+  "In Progress": { bg: "#eef6ff", text: "#1d6fa8", dot: "#38bdf8" },
+  "Completed":   { bg: "#edfaf4", text: "#087443", dot: "#34d399" },
+  "On Hold":     { bg: "#fff0f0", text: "#b42020", dot: "#f87171" },
+  "Dispatched":  { bg: "#f3f0ff", text: "#5b21b6", dot: "#a78bfa" },
 };
 
 function newItem(): LineItem {
@@ -39,42 +39,36 @@ const INIT: Submission = {
   ],
 };
 
-const cardStyle: React.CSSProperties = {
-  background: "#111318",
-  border: "1px solid rgba(255,255,255,0.06)",
-  borderRadius: "12px",
-  overflow: "hidden",
-};
-
 const labelStyle: React.CSSProperties = {
-  display: "block", fontSize: "9px", color: "#52525b",
-  letterSpacing: "0.14em", fontFamily: "monospace", marginBottom: "6px", fontWeight: 600,
+  display: "block", fontSize: "10px", color: "#9b93c9",
+  letterSpacing: "0.12em", fontWeight: 600,
+  textTransform: "uppercase", marginBottom: "6px",
 };
 
 const inputStyle: React.CSSProperties = {
-  width: "100%", background: "#181c24",
-  border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px",
-  padding: "9px 12px", fontSize: "12px", color: "#e2e0da",
-  outline: "none", transition: "border-color 0.2s",
+  width: "100%", background: "#f5f3ff",
+  border: "1px solid #ede9ff", borderRadius: "9px",
+  padding: "9px 12px", fontSize: "13px", color: "#1a1240",
+  outline: "none", transition: "border-color 0.2s", boxSizing: "border-box",
 };
 
 const selectStyle: React.CSSProperties = {
-  width: "100%", background: "#181c24",
-  border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px",
-  padding: "9px 12px", fontSize: "12px", color: "#a1a1aa",
-  outline: "none", cursor: "pointer",
+  width: "100%", background: "#f5f3ff",
+  border: "1px solid #ede9ff", borderRadius: "9px",
+  padding: "9px 12px", fontSize: "13px", color: "#4f3cc9",
+  fontWeight: 600, outline: "none", cursor: "pointer",
 };
 
 const tdSelectStyle: React.CSSProperties = {
-  background: "#181c24", border: "1px solid rgba(255,255,255,0.08)",
-  borderRadius: "6px", padding: "6px 8px", fontSize: "11px",
-  color: "#a1a1aa", outline: "none", width: "100%",
+  background: "#f5f3ff", border: "1px solid #ede9ff",
+  borderRadius: "7px", padding: "6px 8px", fontSize: "11px",
+  color: "#4f3cc9", fontWeight: 600, outline: "none", width: "100%", cursor: "pointer",
 };
 
 const tdInputStyle: React.CSSProperties = {
-  background: "#181c24", border: "1px solid rgba(255,255,255,0.08)",
-  borderRadius: "6px", padding: "6px 8px", fontSize: "11px",
-  color: "#e2e0da", outline: "none", width: "100%",
+  background: "#f5f3ff", border: "1px solid #ede9ff",
+  borderRadius: "7px", padding: "6px 8px", fontSize: "11px",
+  color: "#1a1240", outline: "none", width: "100%", boxSizing: "border-box" as const,
 };
 
 export default function DetailPage() {
@@ -116,47 +110,91 @@ export default function DetailPage() {
 
   const pill = STATUS_PILL[form.status];
 
+  const cardStyle: React.CSSProperties = {
+    background: "#fff",
+    border: "1px solid #ede9ff",
+    borderRadius: "14px",
+    overflow: "hidden",
+  };
+
+  const thStyle: React.CSSProperties = {
+    padding: "10px 12px", textAlign: "left",
+    fontSize: "10px", letterSpacing: "0.12em",
+    color: "#9b93c9", fontWeight: 600,
+    whiteSpace: "nowrap", background: "#faf8ff",
+    textTransform: "uppercase",
+  };
+
   return (
-    <div style={{ minHeight: "100vh", background: "#0a0b0e", color: "#e2e0da", fontFamily: "system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f8f7ff", color: "#1a1240", fontFamily: "system-ui, sans-serif" }}>
 
-      {/* ── NAV ── */}
-      <header className="anim-fade-in" style={{
+      {/* NAV */}
+      <header style={{
         position: "sticky", top: 0, zIndex: 50,
-        background: "rgba(14,15,20,0.92)", backdropFilter: "blur(12px)",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
-        display: "flex", alignItems: "center", gap: "8px",
-        padding: "0 32px", height: "52px",
+        background: "#fff",
+        borderBottom: "1px solid #e8e4ff",
+        display: "flex", alignItems: "center",
+        padding: "0 28px", height: "54px",
       }}>
-        <span style={{ fontFamily: "Georgia, serif", fontSize: "17px", color: "#e8c97a", letterSpacing: "0.03em", marginRight: "8px" }}>◇ GemLab IMS</span>
-        <span style={{ color: "#3f3f46", fontSize: "16px" }}>/</span>
-        <Link href="/submissions" style={{ fontSize: "12px", color: "#71717a", textDecoration: "none" }}>Submissions</Link>
-        <span style={{ color: "#3f3f46", fontSize: "16px" }}>/</span>
-        <span style={{ fontSize: "12px", color: "#c9a84c", fontFamily: "monospace" }}>{form.referenceId}</span>
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginRight: "28px" }}>
+          <div style={{
+            width: "28px", height: "28px", borderRadius: "8px",
+            background: "linear-gradient(135deg, #7c5cfc, #4f3cc9)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <polygon points="7,1 13,5 13,9 7,13 1,9 1,5" fill="white" opacity="0.9" />
+            </svg>
+          </div>
+          <span style={{ fontSize: "16px", fontWeight: 500, color: "#4f3cc9", letterSpacing: "0.01em" }}>
+            GemLab IMS
+          </span>
+        </div>
 
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "12px" }}>
+        {(["SUBMISSIONS", "CLIENTS", "REPORTS"] as const).map((t, i) => (
+          <span key={t} style={{
+            fontSize: "12px", fontWeight: 500, letterSpacing: "0.08em",
+            color: i === 0 ? "#4f3cc9" : "#9b93c9",
+            borderBottom: i === 0 ? "2px solid #7c5cfc" : "2px solid transparent",
+            padding: "0 14px", height: "54px",
+            display: "flex", alignItems: "center",
+            cursor: "pointer",
+          }}>{t}</span>
+        ))}
+
+        {/* Breadcrumb */}
+        <div style={{ marginLeft: "20px", display: "flex", alignItems: "center", gap: "6px", fontSize: "12px" }}>
+          <span style={{ color: "#c4bee8" }}>/</span>
+          <Link href="/submissions" style={{ color: "#9b93c9", textDecoration: "none" }}>Submissions</Link>
+          <span style={{ color: "#c4bee8" }}>/</span>
+          <span style={{ color: "#7c5cfc", fontFamily: "monospace", fontWeight: 600 }}>{form.referenceId}</span>
+        </div>
+
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "10px" }}>
           {/* Status badge */}
           <span style={{
-            display: "inline-flex", alignItems: "center", gap: "6px",
+            display: "inline-flex", alignItems: "center", gap: "5px",
             background: pill.bg, color: pill.text,
-            fontSize: "10px", fontWeight: 600, padding: "5px 12px",
-            borderRadius: "20px",
+            fontSize: "10px", fontWeight: 600, padding: "4px 10px",
+            borderRadius: "20px", whiteSpace: "nowrap",
           }}>
-            <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: pill.dot }} />
+            <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: pill.dot, display: "inline-block" }} />
             {form.status}
           </span>
           {/* Status changer */}
           <select value={form.status} onChange={e => setHeader("status", e.target.value as SubmissionStatus)} style={{
-            background: "#181c24", border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: "8px", padding: "6px 10px", fontSize: "11px",
-            color: "#a1a1aa", outline: "none", cursor: "pointer",
+            background: "#f5f3ff", border: "1px solid #ede9ff",
+            borderRadius: "9px", padding: "6px 10px", fontSize: "11px",
+            color: "#4f3cc9", fontWeight: 600, outline: "none", cursor: "pointer",
           }}>
             {(["Pending","In Progress","Completed","On Hold","Dispatched"] as SubmissionStatus[]).map(s => <option key={s}>{s}</option>)}
           </select>
           <button onClick={save} style={{
-            background: saved ? "#16a34a" : "#c9a84c",
-            color: saved ? "#fff" : "#0f0900",
-            fontWeight: 700, fontSize: "12px", border: "none",
-            padding: "8px 20px", borderRadius: "8px", cursor: "pointer",
+            background: saved ? "#087443" : "#7c5cfc",
+            color: "#fff",
+            fontWeight: 500, fontSize: "12px", border: "none",
+            padding: "8px 20px", borderRadius: "9px", cursor: "pointer",
             transition: "background 0.3s",
           }}>
             {saved ? "✓ Saved" : "Save Changes"}
@@ -164,54 +202,72 @@ export default function DetailPage() {
         </div>
       </header>
 
-      <div style={{ padding: "32px", maxWidth: "100%" }}>
+      <div style={{ padding: "28px 28px 48px" }}>
 
-        {/* ── HEADER SECTION ── */}
-        <div className="anim-fade-up" style={{ ...cardStyle, marginBottom: "20px" }}>
-          {/* Section header bar */}
+        {/* PAGE TITLE */}
+        <div style={{ marginBottom: "22px" }}>
+          <h1 style={{ fontSize: "28px", fontWeight: 500, color: "#1a1240", letterSpacing: "-0.01em", lineHeight: 1.2, margin: 0 }}>
+            Submission Detail
+          </h1>
+          <p style={{ fontSize: "12px", color: "#9b93c9", fontFamily: "monospace", marginTop: "4px", marginBottom: 0 }}>
+            {form.referenceId} · {form.totalItems} item{form.totalItems !== 1 ? "s" : ""}
+          </p>
+        </div>
+
+        {/* HEADER SECTION */}
+        <div style={{ ...cardStyle, marginBottom: "16px" }}>
           <div style={{
-            padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)",
+            padding: "12px 16px", borderBottom: "1px solid #f0ecff",
             display: "flex", alignItems: "center", justifyContent: "space-between",
+            background: "#faf8ff",
           }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <span style={{ fontSize: "9px", letterSpacing: "0.14em", color: "#52525b", fontFamily: "monospace", fontWeight: 600 }}>SUBMISSION HEADER</span>
-              <span style={{ fontFamily: "monospace", fontSize: "11px", color: "#c9a84c", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", padding: "2px 10px", borderRadius: "20px" }}>{form.referenceId}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{ fontSize: "10px", letterSpacing: "0.12em", color: "#9b93c9", fontWeight: 600, textTransform: "uppercase" }}>
+                Submission Header
+              </span>
+              <span style={{
+                fontFamily: "monospace", fontSize: "11px", color: "#7c5cfc",
+                background: "#f3f0ff", border: "1px solid #ede9ff",
+                padding: "2px 10px", borderRadius: "20px",
+              }}>{form.referenceId}</span>
             </div>
-            <div style={{ display: "flex", gap: "20px", fontSize: "11px", color: "#52525b", fontFamily: "monospace" }}>
-              <span>Total Items: <strong style={{ color: "#c9a84c" }}>{form.totalItems}</strong></span>
+            <div style={{ display: "flex", gap: "20px", fontSize: "11px", color: "#b8b2d8", fontFamily: "monospace" }}>
+              <span>Total Items: <strong style={{ color: "#4f3cc9" }}>{form.totalItems}</strong></span>
               <span>Submitted: {new Date(form.submittedAt).toLocaleString("en-IN")}</span>
             </div>
           </div>
 
-          {/* Fields grid */}
-          <div style={{ padding: "24px 20px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+          <div style={{ padding: "24px 16px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
             {[
-              { label: "CLIENT NAME",       key: "clientName"  as const },
-              { label: "MEMBERSHIP ID",     key: "membershipId" as const },
-              { label: "GST / TAX NUMBER",  key: "gstNumber"   as const },
+              { label: "Client Name",      key: "clientName"   as const },
+              { label: "Membership ID",    key: "membershipId" as const },
+              { label: "GST / Tax Number", key: "gstNumber"    as const },
             ].map(f => (
               <div key={f.key}>
                 <label style={labelStyle}>{f.label}</label>
-                <input value={form[f.key] as string} onChange={e => setHeader(f.key, e.target.value)} style={inputStyle}
-                  onFocus={e => (e.target.style.borderColor = "rgba(201,168,76,0.5)")}
-                  onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,0.08)")}
+                <input
+                  value={form[f.key] as string}
+                  onChange={e => setHeader(f.key, e.target.value)}
+                  style={inputStyle}
+                  onFocus={e => (e.target.style.borderColor = "#7c5cfc")}
+                  onBlur={e => (e.target.style.borderColor = "#ede9ff")}
                 />
               </div>
             ))}
             <div>
-              <label style={labelStyle}>SERVICE TYPE</label>
+              <label style={labelStyle}>Service Type</label>
               <select value={form.serviceType} onChange={e => setHeader("serviceType", e.target.value as ServiceType)} style={selectStyle}>
                 {(["Diamond Grading","Colored Stone Analysis","Jewelry Appraisal","Pearl Certification","Synthetic Detection"] as ServiceType[]).map(s => <option key={s}>{s}</option>)}
               </select>
             </div>
             <div>
-              <label style={labelStyle}>TURNAROUND TIME (TAT)</label>
+              <label style={labelStyle}>Turnaround Time (TAT)</label>
               <select value={form.tat} onChange={e => setHeader("tat", e.target.value as TAT)} style={selectStyle}>
                 {(["Normal","Express","Same-day"] as TAT[]).map(s => <option key={s}>{s}</option>)}
               </select>
             </div>
             <div>
-              <label style={labelStyle}>RETURN / LOGISTICS</label>
+              <label style={labelStyle}>Return / Logistics</label>
               <select value={form.logistics} onChange={e => setHeader("logistics", e.target.value as LogisticsMethod)} style={selectStyle}>
                 {(["In-person Pickup","Insured Courier"] as LogisticsMethod[]).map(s => <option key={s}>{s}</option>)}
               </select>
@@ -219,130 +275,128 @@ export default function DetailPage() {
           </div>
         </div>
 
-        {/* ── LINE ITEMS ── */}
-        <div className="anim-fade-up d2" style={cardStyle}>
-          {/* Section header bar */}
+        {/* LINE ITEMS */}
+        <div style={cardStyle}>
           <div style={{
-            padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)",
+            padding: "12px 16px", borderBottom: "1px solid #f0ecff",
             display: "flex", alignItems: "center", justifyContent: "space-between",
+            background: "#faf8ff",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ fontSize: "9px", letterSpacing: "0.14em", color: "#52525b", fontFamily: "monospace", fontWeight: 600 }}>LINE ITEMS</span>
-              <span style={{ fontSize: "10px", color: "#71717a", background: "#1e222b", border: "1px solid rgba(255,255,255,0.07)", padding: "2px 10px", borderRadius: "20px", fontFamily: "monospace" }}>
+              <span style={{ fontSize: "10px", letterSpacing: "0.12em", color: "#9b93c9", fontWeight: 600, textTransform: "uppercase" }}>
+                Line Items
+              </span>
+              <span style={{
+                fontSize: "10px", color: "#6b5fd1",
+                background: "#f3f0ff", border: "1px solid #ede9ff",
+                padding: "2px 10px", borderRadius: "20px", fontFamily: "monospace",
+              }}>
                 {form.lineItems.length} stone{form.lineItems.length !== 1 ? "s" : ""}
               </span>
             </div>
             <button onClick={addItem} style={{
               display: "inline-flex", alignItems: "center", gap: "6px",
-              background: "#c9a84c", color: "#0f0900",
-              fontWeight: 700, fontSize: "11px", border: "none",
-              padding: "7px 14px", borderRadius: "8px", cursor: "pointer",
-            }}>＋ Add Line Item</button>
+              background: "#7c5cfc", color: "#fff",
+              fontWeight: 500, fontSize: "11px", border: "none",
+              padding: "7px 14px", borderRadius: "9px", cursor: "pointer",
+            }}>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M5 1v8M1 5h8" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+              Add Line Item
+            </button>
           </div>
 
           {form.lineItems.length === 0 ? (
             <div style={{ padding: "64px", textAlign: "center" }}>
-              <p style={{ color: "#52525b", marginBottom: "12px" }}>No line items yet</p>
-              <button onClick={addItem} style={{ background: "none", border: "none", color: "#c9a84c", fontSize: "12px", cursor: "pointer", textDecoration: "underline" }}>Add your first stone</button>
+              <p style={{ color: "#b8b2d8", marginBottom: "12px", fontSize: "14px" }}>No line items yet</p>
+              <button onClick={addItem} style={{ background: "none", border: "none", color: "#7c5cfc", fontSize: "12px", cursor: "pointer", textDecoration: "underline" }}>
+                Add your first stone
+              </button>
             </div>
           ) : (
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", minWidth: "1300px" }}>
                 <thead>
-                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                    {["#","ITEM TYPE","WEIGHT","DIMENSIONS (L×W×D mm)","SHAPE","COLOR","CLARITY","CUT","POLISH","SYMMETRY","REMARKS",""].map((h, i) => (
-                      <th key={i} style={{
-                        padding: "10px 12px", textAlign: "left",
-                        fontSize: "9px", letterSpacing: "0.12em",
-                        color: "#52525b", fontFamily: "monospace", fontWeight: 600, whiteSpace: "nowrap",
-                      }}>{h}</th>
+                  <tr style={{ borderBottom: "1px solid #f0ecff" }}>
+                    {["#","Item Type","Weight","Dimensions (L×W×D mm)","Shape","Color","Clarity","Cut","Polish","Symmetry","Remarks",""].map((h, i) => (
+                      <th key={i} style={thStyle}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {form.lineItems.map((item, idx) => (
-                    <tr key={item.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)", transition: "background 0.15s" }}
-                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.02)")}
+                    <tr key={item.id}
+                      style={{ borderBottom: "1px solid #f8f6ff", transition: "background 0.12s" }}
+                      onMouseEnter={e => (e.currentTarget.style.background = "#faf8ff")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     >
-                      {/* # */}
                       <td style={{ padding: "10px 12px", textAlign: "center" }}>
-                        <span style={{ fontFamily: "monospace", color: "#52525b" }}>{idx + 1}</span>
+                        <span style={{ fontFamily: "monospace", color: "#b8b2d8", fontSize: "11px" }}>{idx + 1}</span>
                       </td>
-                      {/* Item Type */}
                       <td style={{ padding: "10px 12px", minWidth: "130px" }}>
                         <select value={item.itemType} onChange={e => updateItem(item.id, "itemType", e.target.value)} style={tdSelectStyle}>
                           {(["Loose Stone","Studded Jewelry"] as ItemType[]).map(o => <option key={o}>{o}</option>)}
                         </select>
                       </td>
-                      {/* Weight */}
                       <td style={{ padding: "10px 12px", minWidth: "120px" }}>
                         <div style={{ display: "flex", gap: "4px" }}>
                           <input type="number" value={item.weightValue} onChange={e => updateItem(item.id, "weightValue", e.target.value)} placeholder="0.00" style={{ ...tdInputStyle, flex: 1 }} />
-                          <select value={item.weightUnit} onChange={e => updateItem(item.id, "weightUnit", e.target.value)} style={{ ...tdSelectStyle, width: "52px", padding: "6px 4px" }}>
+                          <select value={item.weightUnit} onChange={e => updateItem(item.id, "weightUnit", e.target.value)} style={{ ...tdSelectStyle, width: "48px", padding: "6px 4px" }}>
                             <option value="ct">ct</option>
                             <option value="g">g</option>
                           </select>
                         </div>
                       </td>
-                      {/* Dimensions */}
                       <td style={{ padding: "10px 12px", minWidth: "200px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                          <input type="number" value={item.length} onChange={e => updateItem(item.id, "length", e.target.value)} placeholder="L" style={{ ...tdInputStyle, width: "52px" }} />
-                          <span style={{ color: "#3f3f46" }}>×</span>
-                          <input type="number" value={item.width} onChange={e => updateItem(item.id, "width", e.target.value)} placeholder="W" style={{ ...tdInputStyle, width: "52px" }} />
-                          <span style={{ color: "#3f3f46" }}>×</span>
-                          <input type="number" value={item.depth} onChange={e => updateItem(item.id, "depth", e.target.value)} placeholder="D" style={{ ...tdInputStyle, width: "52px" }} />
+                          <input type="number" value={item.length} onChange={e => updateItem(item.id, "length", e.target.value)} placeholder="L" style={{ ...tdInputStyle, width: "50px" }} />
+                          <span style={{ color: "#c4bee8", fontSize: "12px" }}>×</span>
+                          <input type="number" value={item.width} onChange={e => updateItem(item.id, "width", e.target.value)} placeholder="W" style={{ ...tdInputStyle, width: "50px" }} />
+                          <span style={{ color: "#c4bee8", fontSize: "12px" }}>×</span>
+                          <input type="number" value={item.depth} onChange={e => updateItem(item.id, "depth", e.target.value)} placeholder="D" style={{ ...tdInputStyle, width: "50px" }} />
                         </div>
                       </td>
-                      {/* Shape */}
                       <td style={{ padding: "10px 12px", minWidth: "140px" }}>
                         <select value={item.shape} onChange={e => updateItem(item.id, "shape", e.target.value)} style={tdSelectStyle}>
                           {SHAPES.map(o => <option key={o}>{o}</option>)}
                         </select>
                       </td>
-                      {/* Color */}
                       <td style={{ padding: "10px 12px", minWidth: "100px" }}>
                         <select value={item.colorGrade} onChange={e => updateItem(item.id, "colorGrade", e.target.value)} style={tdSelectStyle}>
                           {COLORS.map(o => <option key={o}>{o}</option>)}
                         </select>
                       </td>
-                      {/* Clarity */}
                       <td style={{ padding: "10px 12px", minWidth: "100px" }}>
                         <select value={item.clarityGrade} onChange={e => updateItem(item.id, "clarityGrade", e.target.value)} style={tdSelectStyle}>
                           {CLARITY.map(o => <option key={o}>{o}</option>)}
                         </select>
                       </td>
-                      {/* Cut */}
                       <td style={{ padding: "10px 12px", minWidth: "120px" }}>
                         <select value={item.cutGrade} onChange={e => updateItem(item.id, "cutGrade", e.target.value)} style={tdSelectStyle}>
                           {GRADES.map(o => <option key={o}>{o}</option>)}
                         </select>
                       </td>
-                      {/* Polish */}
                       <td style={{ padding: "10px 12px", minWidth: "120px" }}>
                         <select value={item.polish} onChange={e => updateItem(item.id, "polish", e.target.value)} style={tdSelectStyle}>
                           {(GRADES as PolishSymmetryGrade[]).map(o => <option key={o}>{o}</option>)}
                         </select>
                       </td>
-                      {/* Symmetry */}
                       <td style={{ padding: "10px 12px", minWidth: "120px" }}>
                         <select value={item.symmetry} onChange={e => updateItem(item.id, "symmetry", e.target.value)} style={tdSelectStyle}>
                           {(GRADES as PolishSymmetryGrade[]).map(o => <option key={o}>{o}</option>)}
                         </select>
                       </td>
-                      {/* Remarks */}
                       <td style={{ padding: "10px 12px", minWidth: "160px" }}>
                         <input value={item.remarks} onChange={e => updateItem(item.id, "remarks", e.target.value)} placeholder="Notes..." style={tdInputStyle} />
                       </td>
-                      {/* Delete */}
                       <td style={{ padding: "10px 12px" }}>
                         <button onClick={() => removeItem(item.id)} title="Remove" style={{
-                          background: "none", border: "none", color: "#52525b",
-                          cursor: "pointer", fontSize: "14px", transition: "color 0.2s", padding: "2px 6px",
+                          background: "none", border: "none", color: "#c4bee8",
+                          cursor: "pointer", fontSize: "13px", padding: "2px 6px", transition: "color 0.15s",
                         }}
-                          onMouseEnter={e => ((e.target as HTMLElement).style.color = "#f87171")}
-                          onMouseLeave={e => ((e.target as HTMLElement).style.color = "#52525b")}
+                          onMouseEnter={e => ((e.target as HTMLElement).style.color = "#b42020")}
+                          onMouseLeave={e => ((e.target as HTMLElement).style.color = "#c4bee8")}
                         >✕</button>
                       </td>
                     </tr>
@@ -352,42 +406,43 @@ export default function DetailPage() {
             </div>
           )}
 
-          {/* Table footer */}
           {form.lineItems.length > 0 && (
             <div style={{
-              padding: "12px 20px", borderTop: "1px solid rgba(255,255,255,0.04)",
+              padding: "11px 16px", borderTop: "1px solid #f0ecff",
               display: "flex", justifyContent: "space-between", alignItems: "center",
+              background: "#faf8ff",
             }}>
-              <button onClick={addItem} style={{ background: "none", border: "none", color: "#c9a84c", fontSize: "12px", cursor: "pointer", textDecoration: "underline" }}>
-                ＋ Add another line item
+              <button onClick={addItem} style={{ background: "none", border: "none", color: "#7c5cfc", fontSize: "12px", cursor: "pointer", textDecoration: "underline" }}>
+                + Add another line item
               </button>
-              <span style={{ fontSize: "10px", color: "#3f3f46", fontFamily: "monospace" }}>
+              <span style={{ fontSize: "10px", color: "#c4bee8", fontFamily: "monospace" }}>
                 {form.lineItems.length} item{form.lineItems.length !== 1 ? "s" : ""} · total synced to header
               </span>
             </div>
           )}
         </div>
 
-        {/* ── BOTTOM ACTIONS ── */}
-        <div className="anim-fade-up d3" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "24px", paddingBottom: "32px" }}>
-          <Link href="/submissions" style={{ fontSize: "12px", color: "#71717a", textDecoration: "none" }}>← Back to Dashboard</Link>
+        {/* BOTTOM ACTIONS */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "24px" }}>
+          <Link href="/submissions" style={{ fontSize: "12px", color: "#9b93c9", textDecoration: "none" }}>← Back to Dashboard</Link>
           <div style={{ display: "flex", gap: "10px" }}>
             <button style={{
-              background: "transparent", border: "1px solid rgba(255,255,255,0.09)",
-              color: "#71717a", fontSize: "12px", padding: "9px 18px",
-              borderRadius: "8px", cursor: "pointer",
+              background: "transparent", border: "1px solid #ede9ff",
+              color: "#220de2", fontSize: "12px", padding: "9px 18px",
+              borderRadius: "9px", cursor: "pointer", fontWeight: 500,
             }}>Print / Export PDF</button>
             <button onClick={save} style={{
-              background: saved ? "#16a34a" : "#c9a84c",
-              color: saved ? "#fff" : "#0f0900",
-              fontWeight: 700, fontSize: "12px", border: "none",
-              padding: "9px 24px", borderRadius: "8px", cursor: "pointer",
+              background: saved ? "#087443" : "#7c5cfc",
+              color: "#fff",
+              fontWeight: 500, fontSize: "12px", border: "none",
+              padding: "9px 24px", borderRadius: "9px", cursor: "pointer",
               transition: "background 0.3s",
             }}>
               {saved ? "✓ Saved" : "Save Changes"}
             </button>
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -14,18 +14,25 @@ const MOCK: Submission[] = [
 ];
 
 const STATUS_PILL: Record<SubmissionStatus, { bg: string; text: string; dot: string }> = {
-  "Pending":     { bg: "#2a1f00", text: "#f59e0b", dot: "#f59e0b" },
-  "In Progress": { bg: "#001a2e", text: "#38bdf8", dot: "#38bdf8" },
-  "Completed":   { bg: "#002a1a", text: "#34d399", dot: "#34d399" },
-  "On Hold":     { bg: "#2a0a0a", text: "#f87171", dot: "#f87171" },
-  "Dispatched":  { bg: "#1a0a2e", text: "#a78bfa", dot: "#a78bfa" },
+  "Pending":     { bg: "#fef9ec", text: "#b45309", dot: "#f59e0b" },
+  "In Progress": { bg: "#eef6ff", text: "#1d6fa8", dot: "#38bdf8" },
+  "Completed":   { bg: "#edfaf4", text: "#087443", dot: "#34d399" },
+  "On Hold":     { bg: "#fff0f0", text: "#b42020", dot: "#f87171" },
+  "Dispatched":  { bg: "#f3f0ff", text: "#5b21b6", dot: "#a78bfa" },
 };
 
 const TAT_COLOR: Record<TAT, string> = {
-  "Normal":   "#71717a",
+  "Normal":   "#9b93c9",
   "Express":  "#f59e0b",
   "Same-day": "#f87171",
 };
+
+const STAT_CARDS = [
+  { label: "TOTAL SUBMISSIONS", key: "total" as const,      accent: "linear-gradient(90deg,#f59e0b,#f8c841)" },
+  { label: "PENDING",           key: "pending" as const,    accent: "linear-gradient(90deg,#fb923c,#f59e0b)" },
+  { label: "IN PROGRESS",       key: "inProgress" as const, accent: "linear-gradient(90deg,#38bdf8,#7c5cfc)" },
+  { label: "COMPLETED",         key: "completed" as const,  accent: "linear-gradient(90deg,#34d399,#10b981)" },
+];
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
@@ -35,13 +42,13 @@ function fmtTime(iso: string) {
 }
 
 export default function SubmissionsPage() {
-  const [search, setSearch]               = useState("");
-  const [fStatus, setFStatus]             = useState<SubmissionStatus | "All">("All");
-  const [fService, setFService]           = useState<ServiceType | "All">("All");
-  const [fTAT, setFTAT]                   = useState<TAT | "All">("All");
-  const [fLogistics, setFLogistics]       = useState<"All" | "In-person Pickup" | "Insured Courier">("All");
-  const [sortKey, setSortKey]             = useState<"submittedAt" | "referenceId" | "totalItems">("submittedAt");
-  const [sortDir, setSortDir]             = useState<"asc" | "desc">("desc");
+  const [search, setSearch]         = useState("");
+  const [fStatus, setFStatus]       = useState<SubmissionStatus | "All">("All");
+  const [fService, setFService]     = useState<ServiceType | "All">("All");
+  const [fTAT, setFTAT]             = useState<TAT | "All">("All");
+  const [fLogistics, setFLogistics] = useState<"All" | "In-person Pickup" | "Insured Courier">("All");
+  const [sortKey, setSortKey]       = useState<"submittedAt" | "referenceId" | "totalItems">("submittedAt");
+  const [sortDir, setSortDir]       = useState<"asc" | "desc">("desc");
 
   const rows = useMemo(() => {
     return MOCK.filter(s => {
@@ -55,250 +62,317 @@ export default function SubmissionsPage() {
       );
     }).sort((a, b) => {
       const cmp =
-        sortKey === "totalItems" ? a.totalItems - b.totalItems :
-        sortKey === "referenceId" ? a.referenceId.localeCompare(b.referenceId) :
+        sortKey === "totalItems"   ? a.totalItems - b.totalItems :
+        sortKey === "referenceId"  ? a.referenceId.localeCompare(b.referenceId) :
         a.submittedAt.localeCompare(b.submittedAt);
       return sortDir === "asc" ? cmp : -cmp;
     });
   }, [search, fStatus, fService, fTAT, fLogistics, sortKey, sortDir]);
 
   const stats = {
-    total: MOCK.length,
-    pending: MOCK.filter(s => s.status === "Pending").length,
+    total:      MOCK.length,
+    pending:    MOCK.filter(s => s.status === "Pending").length,
     inProgress: MOCK.filter(s => s.status === "In Progress").length,
-    completed: MOCK.filter(s => s.status === "Completed").length,
+    completed:  MOCK.filter(s => s.status === "Completed").length,
   };
+
+  const hasFilters = search || fStatus !== "All" || fService !== "All" || fTAT !== "All" || fLogistics !== "All";
 
   function toggleSort(k: typeof sortKey) {
     if (sortKey === k) setSortDir(d => d === "asc" ? "desc" : "asc");
     else { setSortKey(k); setSortDir("desc"); }
   }
 
+  function clearFilters() {
+    setSearch(""); setFStatus("All"); setFService("All"); setFTAT("All"); setFLogistics("All");
+  }
+
+  // ── Shared styles ──────────────────────────────────────────────
   const selectStyle: React.CSSProperties = {
-    background: "#181c24",
-    border: "1px solid rgba(255,255,255,0.09)",
-    borderRadius: "8px",
+    background: "#f5f3ff",
+    border: "1px solid #ede9ff",
+    borderRadius: "9px",
     padding: "8px 12px",
     fontSize: "12px",
-    color: "#a1a1aa",
+    color: "#4f3cc9",
+    fontWeight: 600,
     outline: "none",
     cursor: "pointer",
   };
 
-  const inputStyle: React.CSSProperties = {
-    background: "#181c24",
-    border: "1px solid rgba(255,255,255,0.09)",
-    borderRadius: "8px",
-    padding: "8px 12px 8px 36px",
-    fontSize: "12px",
-    color: "#e2e0da",
-    outline: "none",
-    width: "100%",
-    minWidth: "220px",
+  const thStyle: React.CSSProperties = {
+    padding: "11px 16px",
+    textAlign: "left",
+    fontSize: "10px",
+    letterSpacing: "0.12em",
+    color: "#9b93c9",
+    fontWeight: 600,
+    whiteSpace: "nowrap" as const,
+    cursor: "pointer",
+    userSelect: "none" as const,
+    background: "#faf8ff",
+    textTransform: "uppercase" as const,
   };
 
+  const tdStyle: React.CSSProperties = { padding: "13px 16px" };
+
+  const sortIcon = (k: typeof sortKey) =>
+    sortKey === k ? (sortDir === "asc" ? " ↑" : " ↓") : " ↕";
+
   return (
-    <div style={{ minHeight: "100vh", background: "#0a0b0e", color: "#e2e0da", fontFamily: "system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f8f7ff", color: "#1a1240", fontFamily: "system-ui, sans-serif" }}>
 
       {/* ── NAV ── */}
-      <header className="anim-fade-in" style={{
+      <header style={{
         position: "sticky", top: 0, zIndex: 50,
-        background: "rgba(14,15,20,0.92)",
-        backdropFilter: "blur(12px)",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
-        display: "flex", alignItems: "center", gap: "8px",
-        padding: "0 32px", height: "52px",
+        background: "#fff",
+        borderBottom: "1px solid #e8e4ff",
+        display: "flex", alignItems: "center",
+        padding: "0 28px", height: "54px",
       }}>
-        <span style={{ fontFamily: "Georgia, serif", fontSize: "17px", color: "#e8c97a", letterSpacing: "0.03em", marginRight: "24px", whiteSpace: "nowrap" }}>
-          ◇ GemLab IMS
-        </span>
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginRight: "28px" }}>
+          <div style={{
+            width: "28px", height: "28px", borderRadius: "8px",
+            background: "linear-gradient(135deg, #7c5cfc, #4f3cc9)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <polygon points="7,1 13,5 13,9 7,13 1,9 1,5" fill="white" opacity="0.9" />
+            </svg>
+          </div>
+          <span style={{ fontSize: "16px", fontWeight: 500, color: "#4f3cc9", letterSpacing: "0.01em" }}>
+            GemLab IMS
+          </span>
+        </div>
+
         {(["SUBMISSIONS", "CLIENTS", "REPORTS"] as const).map((t, i) => (
           <span key={t} style={{
-            fontSize: "11px", fontWeight: 600, letterSpacing: "0.12em",
-            color: i === 0 ? "#e8c97a" : "#52525b",
-            borderBottom: i === 0 ? "2px solid #c9a84c" : "2px solid transparent",
-            padding: "0 12px", height: "52px", display: "flex", alignItems: "center",
-            cursor: "pointer", transition: "color 0.2s",
+            fontSize: "12px", fontWeight: 500, letterSpacing: "0.08em",
+            color: i === 0 ? "#4f3cc9" : "#9b93c9",
+            borderBottom: i === 0 ? "2px solid #7c5cfc" : "2px solid transparent",
+            padding: "0 14px", height: "54px",
+            display: "flex", alignItems: "center",
+            cursor: "pointer", transition: "color 0.15s",
           }}>{t}</span>
         ))}
+
         <div style={{ marginLeft: "auto" }}>
           <Link href="/submissions/new" style={{
             display: "inline-flex", alignItems: "center", gap: "6px",
-            background: "#c9a84c", color: "#0f0900",
-            fontWeight: 700, fontSize: "11px", letterSpacing: "0.06em",
-            padding: "8px 16px", borderRadius: "8px", textDecoration: "none",
+            background: "#7c5cfc", color: "#fff",
+            fontWeight: 500, fontSize: "12px", letterSpacing: "0.04em",
+            padding: "8px 18px", borderRadius: "9px", textDecoration: "none",
             transition: "background 0.2s",
-          }}>＋ New Submission</Link>
+          }}>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M6 1v10M1 6h10" stroke="white" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+            New Submission
+          </Link>
         </div>
       </header>
 
-      <div style={{ padding: "32px 32px 48px", maxWidth: "100%" }}>
+      <div style={{ padding: "28px 28px 48px" }}>
 
         {/* ── PAGE TITLE ── */}
-        <div className="anim-fade-up" style={{ marginBottom: "28px" }}>
-          <h1 style={{ fontFamily: "Georgia, serif", fontSize: "32px", fontWeight: 300, color: "#f4f0e8", letterSpacing: "0.01em", lineHeight: 1.2 }}>
+        <div style={{ marginBottom: "22px" }}>
+          <h1 style={{ fontSize: "28px", fontWeight: 500, color: "#1a1240", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
             Submission History
           </h1>
-          <p style={{ fontSize: "11px", color: "#52525b", fontFamily: "monospace", marginTop: "6px" }}>
+          <p style={{ fontSize: "12px", color: "#9b93c9", fontFamily: "monospace", marginTop: "4px" }}>
             {rows.length} of {MOCK.length} records
           </p>
         </div>
 
         {/* ── STAT CARDS ── */}
-        <div className="anim-fade-up d1" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "24px" }}>
-          {[
-            { label: "TOTAL SUBMISSIONS", value: stats.total,      accent: "#c9a84c" },
-            { label: "PENDING",           value: stats.pending,    accent: "#f59e0b" },
-            { label: "IN PROGRESS",       value: stats.inProgress, accent: "#38bdf8" },
-            { label: "COMPLETED",         value: stats.completed,  accent: "#34d399" },
-          ].map((s, i) => (
-            <div key={s.label} className={`anim-fade-up d${i + 1}`} style={{
-              background: "#111318",
-              border: "1px solid rgba(255,255,255,0.06)",
-              borderTop: `2px solid ${s.accent}`,
-              borderRadius: "12px",
-              padding: "20px 22px",
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px", marginBottom: "22px" }}>
+          {STAT_CARDS.map(s => (
+            <div key={s.label} style={{
+              background: "#fff",
+              border: "1px solid #ede9ff",
+              borderRadius: "14px",
+              padding: "18px 20px",
+              position: "relative",
+              overflow: "hidden",
             }}>
-              <p style={{ fontSize: "9px", color: "#52525b", letterSpacing: "0.15em", fontFamily: "monospace", marginBottom: "10px" }}>{s.label}</p>
-              <p style={{ fontFamily: "Georgia, serif", fontSize: "40px", fontWeight: 300, color: "#f4f0e8", lineHeight: 1 }}>{s.value}</p>
+              {/* top accent bar */}
+              <div style={{
+                position: "absolute", top: 0, left: 0, right: 0, height: "3px",
+                background: s.accent,
+                borderRadius: "14px 14px 0 0",
+              }} />
+              <p style={{ fontSize: "10px", letterSpacing: "0.12em", color: "#0a0a0a", fontWeight: 600, marginBottom: "10px", textTransform: "uppercase" }}>
+                {s.label}
+              </p>
+              <p style={{ fontSize: "38px", fontWeight: 300, color: "#1a1240", lineHeight: 1 }}>
+                {stats[s.key]}
+              </p>
             </div>
           ))}
         </div>
 
         {/* ── FILTERS ── */}
-        <div className="anim-fade-up d3" style={{
-          background: "#111318",
-          border: "1px solid rgba(255,255,255,0.06)",
-          borderRadius: "12px",
-          padding: "14px 16px",
+        <div style={{
+          background: "#fff",
+          border: "1px solid #ede9ff",
+          borderRadius: "14px",
+          padding: "12px 16px",
           marginBottom: "16px",
           display: "flex", flexWrap: "wrap", gap: "10px", alignItems: "center",
         }}>
           {/* Search */}
-          <div style={{ position: "relative", flex: "1", minWidth: "220px" }}>
-            <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#52525b", fontSize: "14px" }}>⌕</span>
+          <div style={{ position: "relative", flex: 1, minWidth: "200px" }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+              style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", color: "#9b93c9" }}>
+              <circle cx="6" cy="6" r="4.5" stroke="#9b93c9" strokeWidth="1.5" />
+              <path d="M10 10l2.5 2.5" stroke="#9b93c9" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
             <input
               type="text" value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="Search ref ID, client, GST..."
-              style={inputStyle}
+              placeholder="Search ref ID, client, membership..."
+              style={{
+                background: "#f5f3ff", border: "1px solid #ede9ff", borderRadius: "9px",
+                padding: "8px 12px 8px 34px", fontSize: "12px", color: "#1a1240",
+                outline: "none", width: "100%",
+              }}
             />
           </div>
+
           <select value={fStatus} onChange={e => setFStatus(e.target.value as typeof fStatus)} style={selectStyle}>
             <option value="All">All Statuses</option>
-            {(["Pending","In Progress","Completed","On Hold","Dispatched"] as SubmissionStatus[]).map(s => <option key={s}>{s}</option>)}
+            {(["Pending", "In Progress", "Completed", "On Hold", "Dispatched"] as SubmissionStatus[]).map(s => (
+              <option key={s}>{s}</option>
+            ))}
           </select>
+
           <select value={fService} onChange={e => setFService(e.target.value as typeof fService)} style={selectStyle}>
             <option value="All">All Services</option>
-            {(["Diamond Grading","Colored Stone Analysis","Jewelry Appraisal","Pearl Certification","Synthetic Detection"] as ServiceType[]).map(s => <option key={s}>{s}</option>)}
+            {(["Diamond Grading", "Colored Stone Analysis", "Jewelry Appraisal", "Pearl Certification", "Synthetic Detection"] as ServiceType[]).map(s => (
+              <option key={s}>{s}</option>
+            ))}
           </select>
+
           <select value={fTAT} onChange={e => setFTAT(e.target.value as typeof fTAT)} style={selectStyle}>
             <option value="All">All TAT</option>
-            <option value="Normal">Normal</option>
-            <option value="Express">Express</option>
-            <option value="Same-day">Same-day</option>
+            <option>Normal</option>
+            <option>Express</option>
+            <option>Same-day</option>
           </select>
+
           <select value={fLogistics} onChange={e => setFLogistics(e.target.value as typeof fLogistics)} style={selectStyle}>
             <option value="All">All Logistics</option>
             <option value="In-person Pickup">In-person Pickup</option>
             <option value="Insured Courier">Insured Courier</option>
           </select>
-          {(search || fStatus !== "All" || fService !== "All" || fTAT !== "All" || fLogistics !== "All") && (
-            <button onClick={() => { setSearch(""); setFStatus("All"); setFService("All"); setFTAT("All"); setFLogistics("All"); }}
-              style={{ background: "none", border: "none", color: "#71717a", fontSize: "11px", cursor: "pointer", textDecoration: "underline" }}>
+
+          {hasFilters && (
+            <button onClick={clearFilters} style={{
+              background: "none", border: "none", color: "#9b93c9",
+              fontSize: "11px", cursor: "pointer", textDecoration: "underline",
+            }}>
               Clear filters
             </button>
           )}
         </div>
 
         {/* ── TABLE ── */}
-        <div className="anim-fade-up d4" style={{
-          background: "#111318",
-          border: "1px solid rgba(255,255,255,0.06)",
-          borderRadius: "12px",
-          overflow: "hidden",
-        }}>
+        <div style={{ background: "#fff", border: "1px solid #ede9ff", borderRadius: "14px", overflow: "hidden" }}>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                  {([
-                    { label: "REFERENCE ID",  key: "referenceId"  as const },
-                    { label: "CLIENT",         key: null },
-                    { label: "SUBMITTED",      key: "submittedAt" as const },
-                    { label: "SERVICE",        key: null },
-                    { label: "TAT",            key: null },
-                    { label: "LOGISTICS",      key: null },
-                    { label: "ITEMS",          key: "totalItems"  as const },
-                    { label: "STATUS",         key: null },
-                    { label: "",               key: null },
-                  ]).map((col, i) => (
-                    <th key={i} onClick={() => col.key && toggleSort(col.key)} style={{
-                      padding: "12px 16px", textAlign: "left",
-                      fontSize: "9px", letterSpacing: "0.14em", color: "#52525b",
-                      fontWeight: 600, fontFamily: "monospace", whiteSpace: "nowrap",
-                      cursor: col.key ? "pointer" : "default",
-                      userSelect: "none",
-                    }}>
-                      {col.label}
-                      {col.key && <span style={{ marginLeft: "4px", opacity: 0.5 }}>{sortKey === col.key ? (sortDir === "asc" ? "↑" : "↓") : "↕"}</span>}
-                    </th>
-                  ))}
+                <tr style={{ borderBottom: "1px solid #f0ecff" }}>
+                  <th style={thStyle} onClick={() => toggleSort("referenceId")}>
+                    Reference ID{sortIcon("referenceId")}
+                  </th>
+                  <th style={{ ...thStyle, cursor: "default" }}>Client</th>
+                  <th style={thStyle} onClick={() => toggleSort("submittedAt")}>
+                    Submitted{sortIcon("submittedAt")}
+                  </th>
+                  <th style={{ ...thStyle, cursor: "default" }}>Service</th>
+                  <th style={{ ...thStyle, cursor: "default" }}>TAT</th>
+                  <th style={{ ...thStyle, cursor: "default" }}>Logistics</th>
+                  <th style={{ ...thStyle, textAlign: "center" }} onClick={() => toggleSort("totalItems")}>
+                    Items{sortIcon("totalItems")}
+                  </th>
+                  <th style={{ ...thStyle, cursor: "default" }}>Status</th>
+                  <th style={{ ...thStyle, cursor: "default" }} />
                 </tr>
               </thead>
               <tbody>
                 {rows.length === 0 ? (
-                  <tr><td colSpan={9} style={{ textAlign: "center", padding: "48px", color: "#52525b" }}>No results match your filters</td></tr>
-                ) : rows.map((row, i) => {
+                  <tr>
+                    <td colSpan={9} style={{ textAlign: "center", padding: "48px", color: "#b8b2d8" }}>
+                      No results match your filters
+                    </td>
+                  </tr>
+                ) : rows.map(row => {
                   const pill = STATUS_PILL[row.status];
                   return (
-                    <tr key={row.id} className={`anim-fade-up d${Math.min(i + 1, 8)}`} style={{
-                      borderBottom: "1px solid rgba(255,255,255,0.04)",
-                      transition: "background 0.15s",
-                    }}
-                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.025)")}
+                    <tr key={row.id}
+                      style={{ borderBottom: "1px solid #f8f6ff", transition: "background 0.12s", cursor: "pointer" }}
+                      onMouseEnter={e => (e.currentTarget.style.background = "#faf8ff")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     >
-                      <td style={{ padding: "14px 16px", whiteSpace: "nowrap" }}>
-                        <span style={{ fontFamily: "monospace", fontSize: "11px", color: "#c9a84c" }}>{row.referenceId}</span>
+                      <td style={tdStyle}>
+                        <span style={{ fontFamily: "monospace", fontSize: "11px", color: "#7c5cfc", fontWeight: 600 }}>
+                          {row.referenceId}
+                        </span>
                       </td>
-                      <td style={{ padding: "14px 16px" }}>
-                        <p style={{ color: "#e2e0da", fontWeight: 500, marginBottom: "2px" }}>{row.clientName}</p>
-                        <p style={{ fontFamily: "monospace", fontSize: "10px", color: "#52525b" }}>{row.membershipId}</p>
+                      <td style={tdStyle}>
+                        <p style={{ color: "#1a1240", fontWeight: 500, fontSize: "13px", marginBottom: "2px" }}>
+                          {row.clientName}
+                        </p>
+                        <p style={{ fontFamily: "monospace", fontSize: "10px", color: "#b8b2d8" }}>
+                          {row.membershipId}
+                        </p>
                       </td>
-                      <td style={{ padding: "14px 16px", whiteSpace: "nowrap" }}>
-                        <p style={{ color: "#a1a1aa" }}>{fmtDate(row.submittedAt)}</p>
-                        <p style={{ fontFamily: "monospace", fontSize: "10px", color: "#52525b" }}>{fmtTime(row.submittedAt)}</p>
+                      <td style={tdStyle}>
+                        <p style={{ color: "#3d2f8f" }}>{fmtDate(row.submittedAt)}</p>
+                        <p style={{ fontFamily: "monospace", fontSize: "10px", color: "#b8b2d8" }}>
+                          {fmtTime(row.submittedAt)}
+                        </p>
                       </td>
-                      <td style={{ padding: "14px 16px", color: "#a1a1aa", whiteSpace: "nowrap" }}>{row.serviceType}</td>
-                      <td style={{ padding: "14px 16px", whiteSpace: "nowrap" }}>
-                        <span style={{ fontFamily: "monospace", fontWeight: 600, fontSize: "11px", color: TAT_COLOR[row.tat] }}>{row.tat}</span>
+                      <td style={{ ...tdStyle, color: "#3d2f8f", whiteSpace: "nowrap" }}>{row.serviceType}</td>
+                      <td style={tdStyle}>
+                        <span style={{ fontFamily: "monospace", fontWeight: 600, fontSize: "11px", color: TAT_COLOR[row.tat] }}>
+                          {row.tat}
+                        </span>
                       </td>
-                      <td style={{ padding: "14px 16px", color: "#71717a", whiteSpace: "nowrap" }}>
-                        {row.logistics === "Insured Courier" ? "✈ Courier" : "🏢 Pickup"}
+                      <td style={tdStyle}>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "11px", color: "#6b5fd1" }}>
+                          <div style={{
+                            width: "18px", height: "18px", borderRadius: "5px", display: "flex",
+                            alignItems: "center", justifyContent: "center", fontSize: "11px",
+                            background: row.logistics === "Insured Courier" ? "#ede9ff" : "#fef3c7",
+                          }}>
+                            {row.logistics === "Insured Courier" ? "✈" : "🏢"}
+                          </div>
+                          {row.logistics === "Insured Courier" ? "Courier" : "Pickup"}
+                        </div>
                       </td>
-                      <td style={{ padding: "14px 16px", textAlign: "center" }}>
-                        <span style={{ fontFamily: "monospace", color: "#a1a1aa" }}>{row.totalItems}</span>
+                      <td style={{ ...tdStyle, textAlign: "center", fontFamily: "monospace", color: "#3d2f8f", fontWeight: 600 }}>
+                        {row.totalItems}
                       </td>
-                      <td style={{ padding: "14px 16px" }}>
+                      <td style={tdStyle}>
                         <span style={{
-                          display: "inline-flex", alignItems: "center", gap: "6px",
+                          display: "inline-flex", alignItems: "center", gap: "5px",
                           background: pill.bg, color: pill.text,
-                          fontSize: "10px", fontWeight: 600, padding: "4px 10px",
-                          borderRadius: "20px", whiteSpace: "nowrap",
+                          fontSize: "10px", fontWeight: 600,
+                          padding: "4px 10px", borderRadius: "20px", whiteSpace: "nowrap",
                         }}>
                           <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: pill.dot, display: "inline-block" }} />
                           {row.status}
                         </span>
                       </td>
-                      <td style={{ padding: "14px 16px" }}>
-                        <Link href={`/submissions/${row.id}`} style={{
-                          fontSize: "11px", color: "#c9a84c", textDecoration: "none",
-                          fontWeight: 600, opacity: 0, transition: "opacity 0.2s",
-                          whiteSpace: "nowrap",
-                        }}
-                          onMouseEnter={e => ((e.target as HTMLElement).style.opacity = "1")}
-                          onMouseLeave={e => ((e.target as HTMLElement).style.opacity = "0")}
-                        >View →</Link>
+                      <td style={tdStyle}>
+                        <Link href={`/submissions/${row.id}`}
+                          style={{ fontSize: "11px", color: "#7c5cfc", fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }}
+                          onMouseEnter={e => ((e.target as HTMLElement).style.textDecoration = "underline")}
+                          onMouseLeave={e => ((e.target as HTMLElement).style.textDecoration = "none")}
+                        >
+                          View →
+                        </Link>
                       </td>
                     </tr>
                   );
@@ -307,14 +381,17 @@ export default function SubmissionsPage() {
             </table>
           </div>
           <div style={{
-            padding: "12px 16px", borderTop: "1px solid rgba(255,255,255,0.04)",
+            padding: "11px 16px",
+            borderTop: "1px solid #f0ecff",
             display: "flex", justifyContent: "space-between",
-            fontSize: "10px", color: "#3f3f46", fontFamily: "monospace",
+            fontSize: "10px", color: "#c4bee8",
+            fontFamily: "monospace", background: "#faf8ff",
           }}>
             <span>Showing {rows.length} record{rows.length !== 1 ? "s" : ""}</span>
             <span>GemLab IMS · v1.0</span>
           </div>
         </div>
+
       </div>
     </div>
   );
